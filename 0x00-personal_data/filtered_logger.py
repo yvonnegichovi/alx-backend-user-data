@@ -6,7 +6,9 @@ This module returns a log message through regex-ing
 from typing import List
 import re
 
-def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
+
+def filter_datum(fields: List[str], redaction: str, message: str,
+                 separator: str) -> str:
     """
     Returns a log message obfuscated
     Args:
@@ -16,5 +18,6 @@ def filter_datum(fields: List[str], redaction: str, message: str, separator: str
         -- separator - a string representing by which character is seperating
                       all fields in the log line(message)
     """
+    pattern = f"({'|'.join(fields)})=[^{separator}]*"
     return re.sub(pattern, lambda m:
-           m.group(0).split('=')[0] + '=' + reduction, message)
+                  m.group(0).split('=')[0] + '=' + redaction, message)
