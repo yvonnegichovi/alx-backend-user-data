@@ -6,7 +6,6 @@ This module returns a log message through regex-ing
 from typing import List
 import re
 
-
 def filter_datum(fields: List[str], redaction: str, message: str, separator: str) -> str:
     """
     Returns a log message obfuscated
