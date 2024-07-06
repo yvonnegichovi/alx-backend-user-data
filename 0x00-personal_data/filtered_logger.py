@@ -33,7 +33,7 @@ class RedactingFormatter(logging.Formatter):
         formats the records
         """
         record.msg = filter_datum(self.fields, self.REDACTION,
-                     record.msg, self.SEPARATOR)
+                                  record.msg, self.SEPARATOR)
         NotImplementedError
         return super(RedactingFormatter, self).format(record)
 
@@ -66,6 +66,7 @@ def get_logger() -> logging.Logger:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger
+
 
 def get_db() -> connection.MySQLConnection:
     """Connects to the MySQL database and returns the connection object."""
