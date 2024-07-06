@@ -30,7 +30,8 @@ class RedactingFormatter(logging.Formatter):
         """
         formats the records
         """
-        record.msg = filter_datum(self.fields, self.REDACTION, record.msg, self.SEPARATOR)
+        record.msg = filter_datum(self.fields, self.REDACTION,
+                     record.msg, self.SEPARATOR)
         NotImplementedError
         return super(RedactingFormatter, self).format(record)
 
