@@ -5,8 +5,10 @@ This module returns a log message through regex-ing
 
 from typing import List, Tuple
 import logging
+import mysql.connector
+from mysql.connector import connection
+import os
 import re
-import logging
 
 PII_FIELDS: Tuple[str, ...] = ("name", "email", "phone", "ssn", "password")
 
@@ -51,6 +53,7 @@ def filter_datum(fields: List[str], redaction: str, message: str,
     return re.sub(pattern, lambda m:
                   m.group(0).split('=')[0] + '=' + redaction, message)
 
+
 def get_logger() -> logging.Logger:
     """
     returns a logging.Logger
@@ -63,3 +66,17 @@ def get_logger() -> logging.Logger:
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger
+
+def get_db() -> connection.MySQLConnection:
+    """Connects to the MySQL database and returns the connection object."""
+    username = os.getenv("PERSONAL_DATA_DB_USERNAME", "root")
+    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", "")
+    host = os.getenv("PERSONAL_DATA_DB_PASSWORD", "localhost")
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME")
+    conn = mysql.connector.connect(
+        user=username,
+        password=password,
+        host=host,
+        database=db_name
+    )
+    return conn
