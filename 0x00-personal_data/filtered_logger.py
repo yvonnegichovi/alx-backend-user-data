@@ -3,12 +3,12 @@
 This module returns a log message through regex-ing
 """
 
-from typing import List
+from typing import List, Tuple
 import logging
 import re
-
-
 import logging
+
+PII_FIELDS: Tuple[str, ...] = ("name", "email", "phone", "ssn", "password")
 
 
 class RedactingFormatter(logging.Formatter):
@@ -50,3 +50,16 @@ def filter_datum(fields: List[str], redaction: str, message: str,
     pattern = f"({'|'.join(fields)})=[^{separator}]*"
     return re.sub(pattern, lambda m:
                   m.group(0).split('=')[0] + '=' + redaction, message)
+
+def get_logger() -> logging.Logger:
+    """
+    returns a logging.Logger
+    """
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    handler = logging.StreamHandler()
+    formatter = RedactingFormatter(fields=PII_FIELDS)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
