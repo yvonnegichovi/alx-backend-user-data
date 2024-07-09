@@ -17,6 +17,11 @@ CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 auth = None
 AUTH_TYPE = os.getenv('AUTH_TYPE', 'auth')
+if AUTH_TYPE = 'auth':
+    auth = Auth()
+
+if AUTH_TYPE = 'basic_auth':
+    auth = BasicAuth()
 
 @app.errorhandler(404)
 def not_found(error) -> str:
@@ -40,14 +45,6 @@ def forbidden(error) -> str:
     return jsonify({
                     "error": "Forbidden"
                   }), 403
-
-
-if AUTH_TYPE == 'basic_auth':
-    from api.v1.auth.basic_auth import BasicAuth
-    auth = BasicAuth()
-else:
-    from  api.v1.auth.auth import Auth
-    auth = Auth()
 
 
 @app.before_request
