@@ -3,7 +3,7 @@
 contains class BasicAuth
 """
 
-from api.v1.auth import Auth
+from auth import Auth
 
 
 class BasicAuth:
