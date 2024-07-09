@@ -16,7 +16,7 @@ app.register_blueprint(app_views)
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 auth = None
-AUTH_TYPE = os.getenv('AUTH_TYPE')
+AUTH_TYPE = os.getenv('AUTH_TYPE', 'auth')
 
 @app.errorhandler(404)
 def not_found(error) -> str:
