@@ -19,6 +19,11 @@ class Auth:
             return True
         if not path.endswith('/'):
             path += '/'
+        for excluded_path in excluded_paths:
+            if excluded_path.endswith('*'):
+                prefix = excluded_path[:-1]
+                if path.startswith(prefix):
+                    return False
         if path in excluded_paths:
             return False
         return True
