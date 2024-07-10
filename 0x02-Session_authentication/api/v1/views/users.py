@@ -120,3 +120,29 @@ def update_user(user_id: str = None) -> str:
         user.last_name = rj.get('last_name')
     user.save()
     return jsonify(user.to_json()), 200
+
+
+@app_views.route('/users/me', methods=['GET'], strict_slashes=False)
+def get_me() -> str:
+    """ GET /api/v1/users/me
+    Retrieves authenticated User object
+    """
+    if not request.current_user:
+        abort(404)
+    return jsonify(request.current_user.to_dict())
+
+
+@app_views.route('/users/<user_id>', methods=['GET'], strict_slashes=False)
+def get_user() -> str:
+    """ GET /api/v1/users/<user_id>
+    Retrieves a user by ID
+      - 
+    """
+    if user_id == "me":
+        if not request.current_user:
+            abort(404)
+        return jsonify(request.current_user.to_dict())
+    user = storage.get(User, user_id)
+    if not user:
+        abort(404)
+    return jsonify(user.to_dict())
