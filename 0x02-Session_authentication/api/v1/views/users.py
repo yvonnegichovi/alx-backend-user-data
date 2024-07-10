@@ -136,7 +136,6 @@ def get_me() -> str:
 def get_user() -> str:
     """ GET /api/v1/users/<user_id>
     Retrieves a user by ID
-      - 
     """
     if user_id == "me":
         if not request.current_user:
