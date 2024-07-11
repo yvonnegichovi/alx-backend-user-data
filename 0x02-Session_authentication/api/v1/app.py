@@ -53,19 +53,24 @@ def forbidden(error) -> str:
 @app.before_request
 def before_request():
     """Before request hook to handle authentication."""
-    if auth:
-        if auth.require_auth(request.path, ['/api/v1/status/',
-                                            '/api/v1/unauthorized/',
-                                            '/api/v1/forbidden/'
-                                            '/api/v1/auth_session/login/']):
-            auth_header = auth.authorization_header(request)
-            auth_session = auth.session_cookie(request)
-            if not auth_header and not auth_session:
-                abort(401)
-            user = auth.current_user(request)
-            if not user:
-                abort(403)
-            request.current_user = user
+    excluded_paths = [
+        '/api/v1/status/',
+        '/api/v1/unauthorized/',
+        '/api/v1/forbidden/',
+        '/api/v1/auth_session/login/'
+    ]
+    if auth and auth.require_auth(request.path, excluded_paths):
+        auth_header = auth.authorization_header(request)
+        auth_session = auth.session_cookie(request)
+        
+        if not auth_header and not auth_session:
+            abort(401)
+        
+        user = auth.current_user(request)
+        if not user:
+            abort(403)
+        
+        request.current_user = user
 
 
 if __name__ == "__main__":
