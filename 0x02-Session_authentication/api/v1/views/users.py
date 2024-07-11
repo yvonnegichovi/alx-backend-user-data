@@ -25,6 +25,11 @@ def view_one_user(user_id: str = None) -> str:
       - User object JSON represented
       - 404 if the User ID doesn't exist
     """
+    if user_id == "me":
+        if not request.current_user:
+            abort(404)
+        return jsonify(request.current_user.to_json())
+
     if user_id is None:
         abort(404)
     user = User.get(user_id)
@@ -130,18 +135,3 @@ def get_me() -> str:
     if not request.current_user:
         abort(404)
     return jsonify(request.current_user.to_dict())
-
-
-@app_views.route('/users/<user_id>', methods=['GET'], strict_slashes=False)
-def get_user() -> str:
-    """ GET /api/v1/users/<user_id>
-    Retrieves a user by ID
-    """
-    if user_id == "me":
-        if not request.current_user:
-            abort(404)
-        return jsonify(request.current_user.to_dict())
-    user = storage.get(User, user_id)
-    if not user:
-        abort(404)
-    return jsonify(user.to_dict())
