@@ -41,3 +41,13 @@ class SessionAuth(Auth):
         """
         Returns a Uset instance based on a cookie value
         """
+        if request is None:
+            return None
+        session_id = self.session_cookie(request)
+        if not session_id:
+            return None
+        user_id = self.user_id_for_session_id(session_id)
+        if not user_id:
+            return None
+        user = User.get(user_id)
+        return user
