@@ -6,6 +6,7 @@ Contains a class SessionAuth
 from .auth import Auth
 import uuid
 
+app_views.register_blueprint(session_auth)
 
 class SessionAuth(Auth):
     """
