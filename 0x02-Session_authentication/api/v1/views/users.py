@@ -87,7 +87,7 @@ def create_user() -> str:
             user.password = rj.get("password")
             user.first_name = rj.get("first_name")
             user.last_name = rj.get("last_name")
-            user.save()
+           user.save()
             return jsonify(user.to_json()), 201
         except Exception as e:
             error_msg = "Can't create User: {}".format(e)
