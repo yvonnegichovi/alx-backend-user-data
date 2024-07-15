@@ -9,7 +9,6 @@ from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm.exc import NoResultFound
 
 from user import Base, User
-import bycrypt
 
 
 class DB:
@@ -78,16 +77,3 @@ class DB:
             else:
                 raise ValueError("Invalid argument: {}".format(key))
         self._session.commit()
-
-    @property
-    def _hashpassword(self, password: str) -> bytes:
-        """
-        Defines passwords
-        Args:
-            - password: password
-        returns:
-            - bytes: salted hash of the input password
-        """
-        salt = bycrypt.gensalt()
-        hashed_password = bycrypt.hashpwd(password.encode('utf-8'), salt)
-        return hashed_password
