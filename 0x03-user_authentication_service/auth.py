@@ -43,7 +43,7 @@ class Auth:
             return True
         return False
 
-    def create_session(self, email:str) -> str:
+    def create_session(self, email: str) -> str:
         """
         Creates a session and returns a session ID
         """
