@@ -3,6 +3,7 @@
 """
 
 import bcrypt
+import uuid
 from db import DB
 from user import User
 from sqlalchemy.orm.exc import NoResultFound
@@ -32,7 +33,7 @@ class Auth:
             user = self._db.add_user(email, hashed_password)
             return user
 
-    def valid_login(self, email: str, password: str) -> bool:
+    def valid_login(self, email, password) -> bool:
         """
         Validates credentials
         """
@@ -41,6 +42,8 @@ class Auth:
                                    user.hashed_password):
             return True
         return False
+
+    def _generate_uuid()
 
 
 def _hash_password(password: str) -> bytes:
