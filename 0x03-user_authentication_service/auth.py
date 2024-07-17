@@ -59,7 +59,8 @@ class Auth:
         """
         Finds a user by session ID
         """
-        user = self._db._session.query(User).filter_by(session_id)
+        user = self._db._session.query(User).filter_by(
+                session_id=session_id).first()
         if user is None:
             return None
         return user
