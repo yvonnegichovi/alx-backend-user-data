@@ -54,5 +54,25 @@ def login():
     return response
 
 
+@app.route("/sessions", methods=["DELETE"], strict_slashes=False)
+def logout():
+    """
+    Routes handles logout
+    """
+    session_id = request.cookies.get('session_id')
+    if not session_id:
+        return jsonify({"error": "Forbidden"}), 403
+    user = None
+    try:
+        user = auth._db.find_user_by(session_id=session_id)
+    except NoResultFound:
+        return jsonify({"error": "Forbidden"}), 403
+    if user:
+        AUTH.destroy_session(user.id)
+        return redirect('/')
+    else:
+        return jsonify({"error": "Forbidden"}), 403
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000")
