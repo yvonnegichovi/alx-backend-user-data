@@ -64,11 +64,11 @@ def logout():
         return jsonify({"error": "Forbidden"}), 403
     user = None
     try:
-        user = AUTH.find_user_by(session_id=session_id)
+        user = auth._db.find_user_by(session_id=session_id)
     except NoResultFound:
         return jsonify({"error": "Forbidden"}), 403
     if user:
-        AUTH.destroy_session(user.id)
+        auth._db.destroy_session(user.id)
         return redirect('/')
     else:
         return jsonify({"error": "Forbidden"}), 403
