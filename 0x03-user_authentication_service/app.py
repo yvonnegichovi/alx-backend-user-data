@@ -38,7 +38,7 @@ def users():
 @app.route("/sessions", methods=["POST"], strict_slashes=False)
 def login():
     """
-    Implements login 
+    Implements login
     Contains data from email and password
     """
     email = request.form.get("email")
@@ -48,7 +48,8 @@ def login():
         abort(401)
     else:
         session_id = AUTH.create_session(email)
-        response = make_response(jsonify({"email": email, "message": "logged in"}))
+        response = make_response(jsonify({"email": email,
+                                         "message": "logged in"}))
     response.set_cookie("session_id", session_id)
     return response
 
