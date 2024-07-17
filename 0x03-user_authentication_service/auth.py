@@ -55,6 +55,15 @@ class Auth:
             return session_id
         return None
 
+    def get_user_from_session_id(self, session_id: str) -> User or None:
+        """
+        Finds a user by session ID
+        """
+        user = self._db._session.query(User).filter_by(session_id)
+        if user is None:
+            return None
+        return user
+
 
 def _generate_uuid() -> str:
     """
