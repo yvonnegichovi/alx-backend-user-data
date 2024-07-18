@@ -85,10 +85,14 @@ def get_reset_password_token():
     Route implements get reset password token
     """
     email = request.form.get("email")
-    if not email:
+    reset_token = None
+    try:
+        reset_token = AUTH.get_reset_password_token(email)
+    except ValueError:
+        reset_token = None
+    if reset_token is None:
         abort(403)
-    user = AUTH.find_user_by(email=email)
-    return ({"email": user.email, "reset_token": user.reset_token})
+    return ({"email": email, "reset_token": reset_token})
 
 
 if __name__ == "__main__":
