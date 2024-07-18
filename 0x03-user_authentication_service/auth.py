@@ -94,12 +94,9 @@ class Auth:
         """
         Updates password of a User
         """
-        user = None
         try:
             user = self._db.find_user_by(reset_token=reset_token)
         except NoResultFound:
-            user = None
-        if user is None:
             raise ValueError()
         new_hashed_password = _hashed_password(password)
         self._db.update_user(user.id,
