@@ -103,7 +103,7 @@ class Auth:
             raise ValueError()
         new_hashed_password = _hashed_password(password)
         self._db.update_user(user.id,
-                             new_hashed_password=hashed_password,
+                             hashed_password=new_hashed_password,
                              reset_token=None)
 
 
