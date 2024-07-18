@@ -1,84 +1,123 @@
 #!/usr/bin/env python3
+"""A simple end-to-end (E2E) integration test for `app.py`.
 """
-Main file for testing Auth class methods
-"""
-from auth import Auth
-from db import DB
-import bcrypt
+import requests
 
-def create_test_user(email, password):
-    """Helper function to create a test user in the database."""
-    auth = Auth()
-    return auth.register_user(email, password)
 
-def _hash_password(password: str) -> bytes:
+EMAIL = "guillaume@holberton.io"
+PASSWD = "b4l0u"
+NEW_PASSWD = "t4rt1fl3tt3"
+BASE_URL = "http://0.0.0.0:5000"
+
+
+def register_user(email: str, password: str) -> None:
+    """Tests registering a user.
     """
-    Hashes a password
-    Args:
-        - password: password
-    returns:
-        - bytes: salted hash of the input password
+    url = "{}/users".format(BASE_URL)
+    body = {
+        'email': email,
+        'password': password,
+    }
+    res = requests.post(url, data=body)
+    assert res.status_code == 200
+    assert res.json() == {"email": email, "message": "user created"}
+    res = requests.post(url, data=body)
+    assert res.status_code == 400
+    assert res.json() == {"message": "email already registered"}
+
+
+def log_in_wrong_password(email: str, password: str) -> None:
+    """Tests logging in with a wrong password.
     """
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hashed_password
+    url = "{}/sessions".format(BASE_URL)
+    body = {
+        'email': email,
+        'password': password,
+    }
+    res = requests.post(url, data=body)
+    assert res.status_code == 401
 
-# Initialize Auth
-auth = Auth()
 
-# Test user registration
-email = "testuser@example.com"
-password = "testpassword"
-try:
-    user = auth.register_user(email, password)
-    print(f"User {user.email} registered successfully")
-except ValueError as e:
-    print(e)
+def log_in(email: str, password: str) -> str:
+    """Tests logging in.
+    """
+    url = "{}/sessions".format(BASE_URL)
+    body = {
+        'email': email,
+        'password': password,
+    }
+    res = requests.post(url, data=body)
+    assert res.status_code == 200
+    assert res.json() == {"email": email, "message": "logged in"}
+    return res.cookies.get('session_id')
 
-# Test valid login
-print(f"Login valid: {auth.valid_login(email, password)}")
 
-# Test invalid login
-print(f"Login valid: {auth.valid_login(email, 'wrongpassword')}")
+def profile_unlogged() -> None:
+    """Tests retrieving profile information whilst logged out.
+    """
+    url = "{}/profile".format(BASE_URL)
+    res = requests.get(url)
+    assert res.status_code == 403
 
-# Test session creation
-session_id = auth.create_session(email)
-print(f"Session ID: {session_id}")
 
-# Test getting user from session ID
-user_from_session = auth.get_user_from_session_id(session_id)
-if user_from_session:
-    print(f"User from session ID: {user_from_session.email}")
-else:
-    print("No user found with that session ID")
+def profile_logged(session_id: str) -> None:
+    """Tests retrieving profile information whilst logged in.
+    """
+    url = "{}/profile".format(BASE_URL)
+    req_cookies = {
+        'session_id': session_id,
+    }
+    res = requests.get(url, cookies=req_cookies)
+    assert res.status_code == 200
+    assert "email" in res.json()
 
-# Test destroying session
-auth.destroy_session(user.id)
-user_from_session = auth.get_user_from_session_id(session_id)
-if user_from_session:
-    print("Session destruction failed")
-else:
-    print("Session destroyed successfully")
 
-# Test password reset token generation
-reset_token = auth.get_reset_password_token(email)
-print(f"Reset token: {reset_token}")
+def log_out(session_id: str) -> None:
+    """Tests logging out of a session.
+    """
+    url = "{}/sessions".format(BASE_URL)
+    req_cookies = {
+        'session_id': session_id,
+    }
+    res = requests.delete(url, cookies=req_cookies)
+    assert res.status_code == 200
+    assert res.json() == {"message": "Bienvenue"}
 
-# Test updating password with reset token
-new_password = "newpassword"
-try:
-    auth.update_password(reset_token, new_password)
-    print("Password updated successfully")
-except ValueError as e:
-    print(e)
 
-# Test login with new password
-print(f"Login valid: {auth.valid_login(email, new_password)}")
+def reset_password_token(email: str) -> str:
+    """Tests requesting a password reset.
+    """
+    url = "{}/reset_password".format(BASE_URL)
+    body = {'email': email}
+    res = requests.post(url, data=body)
+    assert res.status_code == 200
+    assert "email" in res.json()
+    assert res.json()["email"] == email
+    assert "reset_token" in res.json()
+    return res.json().get('reset_token')
 
-# Test invalid reset token
-try:
-    auth.update_password("invalid_reset_token", new_password)
-    print("This should not print, token should be invalid")
-except ValueError as e:
-    print(f"Expected error: {e}")
 
+def update_password(email: str, reset_token: str, new_password: str) -> None:
+    """Tests updating a user's password.
+    """
+    url = "{}/reset_password".format(BASE_URL)
+    body = {
+        'email': email,
+        'reset_token': reset_token,
+        'new_password': new_password,
+    }
+    res = requests.put(url, data=body)
+    assert res.status_code == 200
+    assert res.json() == {"email": email, "message": "Password updated"}
+
+
+if __name__ == "__main__":
+    register_user(EMAIL, PASSWD)
+    log_in_wrong_password(EMAIL, NEW_PASSWD)
+    profile_unlogged()
+    session_id = log_in(EMAIL, PASSWD)
+    profile_logged(session_id)
+    log_out(session_id)
+    reset_token = reset_password_token(EMAIL)
+    update_password(EMAIL, reset_token, NEW_PASSWD)
+    log_in(EMAIL, NEW_PASSWD)
