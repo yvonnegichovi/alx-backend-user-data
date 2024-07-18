@@ -67,7 +67,7 @@ def logout():
     return redirect(home)
 
 
-@app.route("/profile", methods=["GET"], strict_slashes=False)
+@app.route("/sessions", methods=["GET"], strict_slashes=False)
 def profile():
     """
     Implements user profile
