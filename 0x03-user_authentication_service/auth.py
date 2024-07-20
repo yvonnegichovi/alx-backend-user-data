@@ -37,7 +37,7 @@ class Auth:
         """
         Validates credentials
         """
-        user = self._db._session.query(User).filter_by(email=email).first()
+        user = self._db.find_user_by(email=email)
         if user and bcrypt.checkpw(password.encode('utf-8'),
                                    user.hashed_password):
             return True
@@ -47,11 +47,10 @@ class Auth:
         """
         Creates a session and returns a session ID
         """
-        user = self._db._session.query(User).filter_by(email=email).first()
+        user = self._db.find_user_by(email=email)
         if user:
             session_id = _generate_uuid()
-            user.session_id = session_id
-            self._db._session.commit()
+            self._db.update_user(user.id, session_id=session_id)
             return session_id
         return None
 
@@ -59,8 +58,7 @@ class Auth:
         """
         Finds a user by session ID
         """
-        user = self._db._session.query(User).filter_by(
-                session_id=session_id).first()
+        user = self._db.find_user_by(session_id=essaion_id)
         if user is None:
             return None
         return user
